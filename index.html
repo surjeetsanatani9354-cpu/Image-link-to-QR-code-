@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Premium QR Generator | Surjeet</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        :root {
+            --primary-color: #6366f1;
+            --secondary-color: #a855f7;
+            --bg-dark: #0f172a;
+            --glass-bg: rgba(255, 255, 255, 0.1);
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: linear-gradient(135deg, var(--bg-dark), #1e1e3f);
+            color: white;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            padding: 20px;
+        }
+
+        .container {
+            background: var(--glass-bg);
+            backdrop-filter: blur(15px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            padding: 30px;
+            border-radius: 24px;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+            width: 100%;
+            max-width: 450px;
+            text-align: center;
+        }
+
+        h2 { margin-bottom: 20px; font-weight: 600; letter-spacing: 1px; }
+
+        .input-group {
+            margin-bottom: 20px;
+            text-align: left;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-size: 14px;
+            color: #cbd5e1;
+        }
+
+        input[type="text"] {
+            width: 100%;
+            padding: 12px;
+            border-radius: 12px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            background: rgba(0, 0, 0, 0.2);
+            color: white;
+            box-sizing: border-box;
+            outline: none;
+            transition: 0.3s;
+        }
+
+        input:focus { border-color: var(--primary-color); box-shadow: 0 0 10px rgba(99, 102, 241, 0.3); }
+
+        .btn-generate, .btn-download {
+            width: 100%;
+            padding: 15px;
+            border: none;
+            border-radius: 12px;
+            font-weight: bold;
+            cursor: pointer;
+            font-size: 16px;
+            transition: 0.3s;
+            margin-top: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        .btn-generate {
+            background: linear-gradient(90deg, var(--primary-color), var(--secondary-color));
+            color: white;
+        }
+
+        .btn-download {
+            background: #10b981;
+            color: white;
+            margin-top: 15px;
+        }
+
+        .btn-upload {
+            width: 100%;
+            padding: 12px;
+            border: 2px dashed rgba(255, 255, 255, 0.3);
+            border-radius: 12px;
+            background: transparent;
+            color: #cbd5e1;
+            font-weight: 500;
+            cursor: pointer;
+            font-size: 14px;
+            transition: 0.3s;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            text-decoration: none;
+        }
+
+        #result-area { margin-top: 30px; }
+
+        #qrcode-container {
+            background: white;
+            padding: 20px;
+            border-radius: 15px;
+            display: inline-block;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.2);
+        }
+
+        #qrcode { padding: 10px; }
+
+        .custom-label {
+            color: #000; /* Dark for visibility on white background */
+            font-weight: bold;
+            margin-top: 10px;
+            word-wrap: break-word;
+            font-size: 18px;
+        }
+
+        .hidden { display: none; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h2><i class="fas fa-qrcode"></i> Full QR Saver</h2>
+    
+    <a href="https://imgbb.com/" target="_blank" class="btn-upload">
+        <i class="fas fa-cloud-upload-alt"></i> Upload Image (Get Link)
+    </a>
+
+    <div class="input-group">
+        <label>Paste Link / URL</label>
+        <input type="text" id="qr-link" placeholder="https://example.com">
+    </div>
+
+    <div class="input-group">
+        <label>Text on QR (Required for combined download)</label>
+        <input type="text" id="qr-text" placeholder="e.g. Scan Me!">
+    </div>
+
+    <button class="btn-generate" onclick="generateQR()">
+        <i class="fas fa-magic"></i> Generate QR Code
+    </button>
+
+    <div id="result-area" class="hidden">
+        <div id="qrcode-container">
+            <div id="qrcode"></div>
+            <div id="display-text" class="custom-label"></div>
+        </div>
+        
+        <button class="btn-download" onclick="downloadFullQR()">
+            <i class="fas fa-download"></i> Download Full Image
+        </button>
+    </div>
+</div>
+
+<script>
+    function generateQR() {
+        const qrLink = document.getElementById("qr-link").value.trim();
+        const customText = document.getElementById("qr-text").value.trim();
+        const qrDisplay = document.getElementById("qrcode");
+        const displayText = document.getElementById("display-text");
+        const resultArea = document.getElementById("result-area");
+
+        if (!qrLink) return alert("Link daalna zaroori hai!");
+
+        qrDisplay.innerHTML = ""; 
+
+        new QRCode(qrDisplay, {
+            text: qrLink,
+            width: 256,
+            height: 256,
+            colorDark : "#000000",
+            colorLight : "#ffffff",
+            correctLevel : QRCode.CorrectLevel.H
+        });
+
+        displayText.innerText = customText;
+        resultArea.classList.remove('hidden');
+    }
+
+    function downloadFullQR() {
+        const qrCanvas = document.querySelector('#qrcode canvas');
+        const customText = document.getElementById("qr-text").value.trim();
+        
+        // Ek naya temporary canvas banayenge text include karne ke liye
+        const finalCanvas = document.createElement('canvas');
+        const ctx = finalCanvas.getContext('2d');
+
+        // Canvas ka size (QR + Text space)
+        const padding = 40;
+        const textSpace = customText ? 60 : 0;
+        finalCanvas.width = qrCanvas.width + padding;
+        finalCanvas.height = qrCanvas.height + padding + textSpace;
+
+        // Background white color fill karna
+        ctx.fillStyle = "#ffffff";
+        ctx.fillRect(0, 0, finalCanvas.width, finalCanvas.height);
+
+        // QR Code draw karna (Center mein)
+        ctx.drawImage(qrCanvas, padding/2, padding/2);
+
+        // Text draw karna
+        if (customText) {
+            ctx.fillStyle = "#000000";
+            ctx.font = "bold 20px Poppins, Arial";
+            ctx.textAlign = "center";
+            ctx.fillText(customText, finalCanvas.width / 2, qrCanvas.height + padding + 10);
+        }
+
+        // Image download trigger karna
+        const link = document.createElement('a');
+        link.href = finalCanvas.toDataURL("image/png");
+        link.download = 'Surjeet_QR_Full.png';
+        link.click();
+    }
+</script>
+
+</body>
+  </html>
